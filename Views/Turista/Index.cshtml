@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Turismo.Domain.Entities.Turista>
+
+<div class="w-100 card border-0 p-4">
+	<div class="card-header bg-info bg-gradient m-lg-0 py-3">
+		<div class="row">
+			<div class="col-12 text-center">
+				<h2 class="text-red py-2">Turists List</h2>
+			</div>
+		</div>
+	</div>
+	<div class="card-body border p-4">
+		<div class="row pb-3">
+			<div class="col-6 offset-6 text-end">
+				<a asp-controller="Turista" asp-action="Create" class="btn btn-secondary">
+					<i class="bi bi-patch-plus"></i> Create New Turists
+				</a>
+			</div>
+		</div>
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Started</th>
+					<th>Satisfaction</th>
+					<th>country</th>
+					<th>language</th>
+					<th>region</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				@foreach (var obj in Model)
+				{
+					<tr>
+						<td>@obj.Name</td>
+						<td>@obj.Description</td>
+						<td>@obj.Started</td>
+						<td>@obj.Satisfaction</td>
+						<td>@obj.country</td>
+						<td>@obj.language</td>
+						<td>@obj.region</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
