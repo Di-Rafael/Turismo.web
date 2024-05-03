@@ -13,7 +13,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light  border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Turismo.web</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="~/images/images.png" style="width: 35px" /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -29,6 +29,9 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Turista" asp-action="Index">Turistas</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="TuristaNumber" asp-action="Index">Turista Numbers</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -36,13 +39,21 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (TempData["error"] != null)
+            {
+                <div class="text-danger h3">@TempData["error"]</div>
+            }
+            @if (TempData["success"] != null)
+            {
+                <div class="text-danger h3">@TempData["success"]</div>
+            }
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Turismo.web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer bg-dark text-muted">
+        <div class="container text-center">
+            Made with <i class="bi bi-heart-fill"></i> by Diogo Devesas
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
