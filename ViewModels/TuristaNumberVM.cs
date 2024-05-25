@@ -6,7 +6,7 @@ namespace Turismo.web.ViewModels
 {
     public class TuristaNumberVM
     {
-        public TuristaNumbers TuristaNumbers { get; set; } = null!;
+        public TuristaNumber TuristaNumber { get; set; } = null!;
 
         [ValidateNever]
         public IEnumerable<SelectListItem>? TuristaList { get; set; }

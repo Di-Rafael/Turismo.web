@@ -1,109 +1,155 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Turismo.Application.Common.Interfaces;
 using Turismo.Domain.Entities;
-using Turismo.Infrastructure.Data;
+using Turismo.web.ViewModels;
 
 namespace Turismo.web.Controllers
 {
 	public class TuristaNumberController : Controller
 	{
-		private readonly ApplicationDbContext _db;
+		private readonly IUnitOfWork _unitOfWork;
 
-		public TuristaNumberController(ApplicationDbContext db)
+		public TuristaNumberController(IUnitOfWork unitOfWork)
 		{
-			_db = db;
+			_unitOfWork = unitOfWork;
 		}
 
 		public IActionResult Index()
 		{
-			var TuristaNumbers = _db.TuristaNumbers
-				.Include(u => u.Turista)
-				.ToList();
-
-			return View(TuristaNumbers);
+			var TuristaNumber = _unitOfWork.TuristaNumber.GetAll(includeProperties: "Turista");
+			return base.View((object)TuristaNumber);
 		}
 
 		public IActionResult Create()
 		{
-			return View();
+			TuristaNumberVM TuristaNumberVM = new()
+			{
+				TuristaList = _unitOfWork.Turista.GetAll().Select(u => new SelectListItem
+				{
+					Text = u.Name,
+					Value = u.Id.ToString()
+				})
+			};
+			return View(TuristaNumberVM);
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(TuristaNumbers obj)
+		public IActionResult Create(TuristaNumberVM obj)
 		{
 			if (ModelState.IsValid)
 			{
-				_db.TuristaNumbers.Add(obj);
-				_db.SaveChanges();
-				TempData["success"] = "The Youtuber Records has been created successfully.";
-				return RedirectToAction(nameof(Index));
+				bool roomNumberExists = _unitOfWork.TuristaNumber.Any(u => u.Turista_Number == obj.TuristaNumber.Turista_Number);
+
+				if (!roomNumberExists)
+				{
+					// Remove the explicit setting of the Votos property
+					obj.TuristaNumber.Turista_Number = 0; // Or any default value if necessary
+
+					_unitOfWork.TuristaNumber.Add(obj.TuristaNumber);
+					_unitOfWork.Save();
+
+					TempData["success"] = "The turista number has been created successfully.";
+					return RedirectToAction(nameof(Index));
+				}
+				else
+				{
+					TempData["error"] = "O turista with the same number value already exists.";
+				}
 			}
 
-			TempData["error"] = "The Youtuber Records could not be created.";
+			// Re-populate the YoutuberList property
+			obj.TuristaList = _unitOfWork.Turista.GetAll().Select(u => new SelectListItem
+			{
+				Text = u.Name,
+				Value = u.Id.ToString()
+			}).ToList();
+
 			return View(obj);
 		}
-		public IActionResult Update(int villaId)
+		public IActionResult Update(int turistaNumberId)
 		{
-			Turista? obj = _db.Turistas.FirstOrDefault(_ => _.Id == villaId);
+			TuristaNumberVM TuristaNumberVM = new() 
+			{
+				TuristaList = _unitOfWork.Turista.GetAll().Select(y => new SelectListItem
+				{
+					Text = y.Name,
+					Value = y.Id.ToString()
+				})
+					.ToList(),
+				TuristaNumber = (Domain.Entities.TuristaNumber)_unitOfWork.TuristaNumber.Get(y => y.Turista_Number == turistaNumberId)
+			};
 
-			//Villa? obj2 = _db.Villas.Find(villaId);
-			//var VillaList = _db.Villas.Where(_ => _.Price > 50 && _.Occupancy > 0);
-
-			if (obj is null)
+			if (TuristaNumberVM.TuristaNumber == null)
 			{
 				return RedirectToAction("Error", "Home");
 			}
 
-			return View(obj);
+			return View(TuristaNumberVM);
 		}
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Update(Turista obj)
+		public IActionResult Update(TuristaNumberVM viewModel)
 		{
-			if (ModelState.IsValid && obj.Id > 0)
+			if (ModelState.IsValid && viewModel.TuristaNumber != null)
 			{
-				_db.Turistas.Update(obj);
-				_db.SaveChanges();
-				TempData["success"] = "The villa has been updated successfully.";
+				_unitOfWork.TuristaNumber.Update(viewModel.TuristaNumber);
+				_unitOfWork.Save();
+				TempData["success"] = "The turista number has been updated successfully.";
 				return RedirectToAction(nameof(Index));
 			}
 
-			TempData["error"] = "The villa could not be updated.";
-			return View(obj);
+			TempData["error"] = "The turista number could not be updated.";
+			viewModel.TuristaList = _unitOfWork.Turista.GetAll().Select(y => new SelectListItem
+			{
+				Text = y.Name,
+				Value = y.Id.ToString()
+			})
+				.ToList();
+
+			return View(viewModel);
 		}
 
-		public IActionResult Delete(int villaId)
+		public IActionResult Delete(int turistaNumberId)
 		{
-			Turista? obj = _db.Turistas.FirstOrDefault(_ => _.Id == villaId);
+			TuristaNumberVM TuristaNumberVM = new()
+			{
+				TuristaList = _unitOfWork.Turista.GetAll().Select(u => new SelectListItem
+				{
+					Text = u.Name,
+					Value = u.Id.ToString()
+				}),
+				TuristaNumber = (TuristaNumber)_unitOfWork.TuristaNumber.Get(_ => _.Turista_Number == turistaNumberId)!
+			};
 
-			if (obj is null)
+			if (TuristaNumberVM.TuristaNumber is null)
 			{
 				return RedirectToAction("Error", "Home");
 			}
 
-			return View(obj);
+			return View(TuristaNumberVM);
 		}
 
 		[HttpPost]
-		public IActionResult Delete(Turista obj)
+		[ValidateAntiForgeryToken]
+		public IActionResult Delete(TuristaNumberVM TuristaNumberVM)
 		{
-			Turista? objFromDb = _db.Turistas.FirstOrDefault(_ => _.Id == obj.Id);
+			TuristaNumber objFromDb = (TuristaNumber)_unitOfWork.TuristaNumber.Get(_ => _.Turista_Number == TuristaNumberVM.TuristaNumber.Turista_Number);
 
 			if (objFromDb is not null)
 			{
-				_db.Turistas.Remove(objFromDb);
-				_db.SaveChanges();
+				_unitOfWork.TuristaNumber.Remove(objFromDb);
+				_unitOfWork.Save();
 
-				TempData["success"] = "The villa has been deleted successfully.";
+				TempData["success"] = "The turista number has been deleted successfully.";
 
 				return RedirectToAction(nameof(Index));
 			}
 
-			TempData["error"] = "The villa could not be deleted.";
-			return View(obj);
+			TempData["error"] = "The turista number could not be deleted.";
+			return View(TuristaNumberVM);
 		}
 	}
 }

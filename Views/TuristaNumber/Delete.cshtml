@@ -10,22 +10,22 @@
     </div>
     <div class="card-body border p-4">
         <form method="post" class="row">
-            <input asp-for="TuristaNumbers.Turista_Number" hidden />
+            <input asp-for="TuristaNumber.Turista_Number" hidden />
 
             <div class="p-3">
                 <div class="form-floating py-1 col-12">
-                    <select asp-for="@Model.TuristaNumbers.TuristaId" disabled asp-items="@Model.TuristaList" class="form-select border shadow">
+                    <select asp-for="@Model.TuristaNumber.TuristaId" disabled asp-items="@Model.TuristaList" class="form-select border shadow">
                         <option disabled selected>-- Select Villa --</option>
                     </select>
-                    <label asp-for="TuristaNumbers.TuristaId" class="ms-2"></label>
+                    <label asp-for="TuristaNumber.TuristaId" class="ms-2"></label>
                 </div>
                 <div class="form-floating py-1 col-12">
-                    <input asp-for="TuristaNumbers.Turista_Number" disabled class="form-control border shadow" />
-                    <label asp-for="TuristaNumbers.Turista_Number" class="ms-2"></label>
+                    <input asp-for="TuristaNumber.Turista_Number" disabled class="form-control border shadow" />
+                    <label asp-for="TuristaNumber.Turista_Number" class="ms-2"></label>
                 </div>
                 <div class="form-floating py-1 col-12">
-                    <input asp-for="TuristaNumbers.SpecialDetails" disabled class="form-control border shadow" />
-                    <label asp-for="TuristaNumbers.SpecialDetails" class="ms-2"></label>
+                    <input asp-for="TuristaNumber.SpecialDetails" disabled class="form-control border shadow" />
+                    <label asp-for="TuristaNumber.SpecialDetails" class="ms-2"></label>
                 </div>
                 <div class="row pt-2">
                     <div class="col-6 col-md-3">

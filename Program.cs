@@ -1,13 +1,20 @@
 using Microsoft.EntityFrameworkCore;
+using Turismo.Application.Common.Interfaces;
 using Turismo.Infrastructure.Data;
+using Turismo.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Adicionar ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Adicionar UnitOfWork (acesso aos repositórios)
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 var app = builder.Build();
 
